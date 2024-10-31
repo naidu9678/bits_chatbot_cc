@@ -6,7 +6,7 @@ import os
 
 def get_llm_api_key():
     # Darsh, Please insert code here.
-    return "AIzaSyBG5TCCSusvqD7sCnrZfz6TgHoRpJJIxXM"  # os.environ.get('LLM_API_KEY')
+    return os.environ.get('LLM_API_KEY')
 
 
 class Config():
