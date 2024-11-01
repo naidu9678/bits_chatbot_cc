@@ -8,5 +8,5 @@ from app.config import Config
 
 def create_app():
     st.set_page_config(page_title=Config.APP_TITLE)
-   
+
     render_ui()
