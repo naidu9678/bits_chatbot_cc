@@ -9,6 +9,7 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
 from dotenv import load_dotenv
 import faiss
+import boto3 
 
 # Load environment variables from .env file
 load_dotenv()
@@ -20,6 +21,11 @@ st.title("BITS WILP Smart AI Assistant")
 if 'vectorstore' not in st.session_state:
     st.session_state.vectorstore = None
     st.session_state.chat_history = []
+
+def aws_s3_faiss_index():
+# Downlaod faiss index files in the faiss_index directory     
+    pass
+
 
 def initialize_vectorstore():
     """Initialize the vector store and load it into session state if not already done."""

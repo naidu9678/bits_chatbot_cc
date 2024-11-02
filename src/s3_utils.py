@@ -55,7 +55,26 @@ def get_all_pickles():
             print("No Pickle files found.")
     except (ClientError, NoCredentialsError) as e:
         print(f'Error fetching Pickles: {e}')
+        
+def download_pdfs_to_local():
+    """Download all PDF files from S3 to a local directory."""
+    pdf_files = get_all_pdfs()
+    local_folder = 'faiss_index'
+    os.makedirs(local_folder, exist_ok=True)
 
+    try:
+        s3 = get_s3_client()
+        for pdf_key in pdf_files:
+            file_name = os.path.basename(pdf_key)
+            local_path = os.path.join(local_folder, file_name)
+            print(f"Downloading {pdf_key} to {local_path}")
+            s3.download_file(
+                Config.BUCKET_NAME,
+                pdf_key,
+                local_path
+            )
+    except (ClientError, NoCredentialsError) as e:
+        print(f'Error downloading PDFs: {e}')
 
 def add_pickle(file_name, file_path):
     """Upload a Pickle file to the specified S3 bucket directory."""
