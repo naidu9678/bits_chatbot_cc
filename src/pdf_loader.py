@@ -7,7 +7,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from dotenv import load_dotenv
-from aws_utils import download_files_to_local, set_env_variable
+from aws_utils import download_files_to_local, set_env_variable, upload_directory_to_s3, download_pickles_to_local
 
 
 def load_pdfs_to_vectorstore(pdf_paths, faiss_index_path):
@@ -62,15 +62,17 @@ if __name__ == "__main__":
     pdfs_folder = "static/pdfs"  # Path to your PDFs folder
     faiss_index_path = "static/faiss_index"  # Path to your FAISS index file
     download_files_to_local(pdfs_folder)
-
-    # os.makedirs('static/faiss_index', exist_ok=True)
-
+    download_pickles_to_local(faiss_index_path)
+    
     # Collect all PDF file paths from the specified folder
     pdf_files = [os.path.join(pdfs_folder, filename) for filename in os.listdir(pdfs_folder) if filename.endswith('.pdf')]
     
     try:
         updated_vectorstore = load_pdfs_to_vectorstore(pdf_files, faiss_index_path)
         print("PDFs loaded successfully into the vector store.")
+
+        # Upload Pickles directory (FAISS index files) to S3
+        upload_directory_to_s3(faiss_index_path)
     except Exception as e:
         print(f"An error occurred: {e}")
     finally:

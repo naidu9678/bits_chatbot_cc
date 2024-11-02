@@ -87,31 +87,40 @@ def download_files_to_local(local_folder):
     except (ClientError, NoCredentialsError) as e:
         print(f'Error downloading files: {e}')
 
-def add_pickle(file_name, file_path):
-    """Upload a Pickle file to the specified S3 bucket directory."""
+def download_pickles_to_local(local_folder):
+    """Download all files from a specified S3 directory to a local directory."""
+    files = get_all_pickles()
+    os.makedirs(local_folder, exist_ok=True)
+
     try:
         s3 = get_s3_client()
-        s3.upload_file(
-            file_path,
-            Config.BUCKET_NAME,
-            f"{Config.PICKLE_DIR}{file_name}"
-        )
-        print(f"Uploaded {file_name} to {Config.PICKLE_DIR}")
-    except (ClientError, NoCredentialsError) as e:
-        print(f"Could not upload {file_name}: {e}")
+        for file_key in files:
+            # Encode the file key to handle spaces and special characters
+            # encoded_file_key = urllib.parse.quote(file_key)
+            # print(encoded_file_key)
+            file_name = os.path.basename(file_key)
+            local_path = os.path.join(local_folder, file_name)
+            print(f"Downloading {file_key} to {local_path}")
 
-
-def delete_pickle(file_name):
-    """Delete a Pickle file from the specified S3 bucket directory."""
-    try:
-        s3 = get_s3_client()
-        s3.delete_object(
-            Bucket=Config.BUCKET_NAME,
-            Key=f"{Config.PICKLE_DIR}{file_name}"
-        )
-        print(f"Deleted {file_name} from {Config.PICKLE_DIR}")
+            # Download the file using the URL-encoded key
+            s3.download_file(
+                Config.BUCKET_NAME,
+                file_key,
+                local_path
+            )
     except (ClientError, NoCredentialsError) as e:
-        print(f"Could not delete {file_name}: {e}")
+        print(f'Error downloading files: {e}')
+
+def upload_directory_to_s3(local_folder):
+    """
+    Upload all files from a local directory to an S3 bucket.
+    """
+    s3 = get_s3_client()
+    for root, _, files in os.walk(local_folder):
+        for file in files:
+            local_path = os.path.join(root, file)
+            s3_path = os.path.join(Config.PICKLE_DIR, file)
+            s3.upload_file(local_path, Config.BUCKET_NAME, Config.PICKLE_DIR)
 
 
 def add_pdf(file_name, file_path):
