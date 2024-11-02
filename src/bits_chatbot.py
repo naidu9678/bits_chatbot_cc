@@ -8,11 +8,11 @@ from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
 from dotenv import load_dotenv
-import faiss
-import boto3 
+from aws_utils import set_env_variable
 
 # Load environment variables from .env file
-load_dotenv()
+# load_dotenv()
+set_env_variable()
 
 # Streamlit app title
 st.title("BITS WILP Smart AI Assistant")
@@ -22,16 +22,11 @@ if 'vectorstore' not in st.session_state:
     st.session_state.vectorstore = None
     st.session_state.chat_history = []
 
-def aws_s3_faiss_index():
-# Downlaod faiss index files in the faiss_index directory     
-    pass
-
-
 def initialize_vectorstore():
     """Initialize the vector store and load it into session state if not already done."""
     try:
         embedding_model = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-        vectorstore = FAISS.load_local("faiss_index", embedding_model, allow_dangerous_deserialization=True)
+        vectorstore = FAISS.load_local("static/faiss_index", embedding_model, allow_dangerous_deserialization=True)
         st.session_state.vectorstore = vectorstore
     except Exception as e:
         st.error(f"Error initializing vector store: {e}")

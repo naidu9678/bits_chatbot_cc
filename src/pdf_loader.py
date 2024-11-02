@@ -1,12 +1,13 @@
 # pdf_loader.py
 
 import os
+import faiss
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from dotenv import load_dotenv
-import boto3
+from aws_utils import download_files_to_local
 
 def load_pdfs_to_vectorstore(pdf_paths, faiss_index_path):
     """
@@ -22,6 +23,16 @@ def load_pdfs_to_vectorstore(pdf_paths, faiss_index_path):
         # Create embeddings
         embedding_model = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
         vectorstore = FAISS.load_local(faiss_index_path, embedding_model, allow_dangerous_deserialization=True)
+
+        # # Define the embedding dimension (replace 512 with the correct dimension)
+        # embedding_dim = 512  # Assume the embedding dimension is known
+
+        # # Check if FAISS index exists; if not, create a new one
+        # if os.path.exists(faiss_index_path):
+        #     vectorstore = FAISS.load_local(faiss_index_path, embedding_model, allow_dangerous_deserialization=True)
+        # else:
+        #     index = faiss.IndexFlatL2(embedding_dim)  # Initialize based on embedding dimension
+        #     vectorstore = FAISS(index, embedding_model)
 
         for pdf_path in pdf_paths:
             # Load PDF
@@ -44,12 +55,14 @@ def load_pdfs_to_vectorstore(pdf_paths, faiss_index_path):
 
 if __name__ == "__main__":
     # Define the folder containing PDF files
-    pdfs_folder = "pdfs"  # Path to your PDFs folder
-    faiss_index_path = "faiss_index"  # Path to your FAISS index file
+    pdfs_folder = "static/pdfs"  # Path to your PDFs folder
+    faiss_index_path = "static/faiss_index"  # Path to your FAISS index file
+    download_files_to_local(pdfs_folder)
 
+    # os.makedirs('static/faiss_index', exist_ok=True)
     # Collect all PDF file paths from the specified folder
     pdf_files = [os.path.join(pdfs_folder, filename) for filename in os.listdir(pdfs_folder) if filename.endswith('.pdf')]
-
+    
     try:
         updated_vectorstore = load_pdfs_to_vectorstore(pdf_files, faiss_index_path)
         print("PDFs loaded successfully into the vector store.")
