@@ -2,6 +2,7 @@
 
 import os
 import faiss
+import shutil
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
@@ -60,6 +61,7 @@ if __name__ == "__main__":
     download_files_to_local(pdfs_folder)
 
     # os.makedirs('static/faiss_index', exist_ok=True)
+
     # Collect all PDF file paths from the specified folder
     pdf_files = [os.path.join(pdfs_folder, filename) for filename in os.listdir(pdfs_folder) if filename.endswith('.pdf')]
     
@@ -68,3 +70,8 @@ if __name__ == "__main__":
         print("PDFs loaded successfully into the vector store.")
     except Exception as e:
         print(f"An error occurred: {e}")
+    finally:
+        # Clean up: Delete the static/pdfs directory and its contents
+        if os.path.exists(pdfs_folder):
+            shutil.rmtree(pdfs_folder)
+            print(f"Deleted {pdfs_folder} and its contents.")    
