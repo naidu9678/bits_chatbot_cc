@@ -27,7 +27,7 @@ def get_s3_client():
 def set_env_variable():
     os.environ['GOOGLE_API_KEY'] = json.loads(
     boto3.client('secretsmanager', region_name=Config.REGION_NAME)
-    .get_secret_value(SecretId='chatbot/lmm/key')['SecretString']).get('GOOGLE_API_KEY')
+    .get_secret_value(SecretId=Config.SECRET_RECORD)['SecretString']).get('GOOGLE_API_KEY')
 
 def get_all_pdfs():
     """List all PDF files in the specified S3 bucket directory."""

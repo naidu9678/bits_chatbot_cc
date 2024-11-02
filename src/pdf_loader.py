@@ -7,7 +7,8 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from dotenv import load_dotenv
-from aws_utils import download_files_to_local
+from aws_utils import download_files_to_local, set_env_variable
+
 
 def load_pdfs_to_vectorstore(pdf_paths, faiss_index_path):
     """
@@ -17,8 +18,11 @@ def load_pdfs_to_vectorstore(pdf_paths, faiss_index_path):
     :param faiss_index_path: Path to save/load the FAISS index.
     :return: The updated FAISS vector store.
     """
-    # Load environment variables from .env file
-    load_dotenv()
+
+    # Set required environment variables for gemini api key
+    set_env_variable()
+
+
     try:
         # Create embeddings
         embedding_model = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
