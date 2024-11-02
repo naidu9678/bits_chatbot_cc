@@ -10,3 +10,4 @@ langchainhub
 pypdf
 rapidocr-onnxruntime
 boto3
+faiss-cpu

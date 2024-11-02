@@ -1,7 +1,6 @@
 # pdf_loader.py
 
 import os
-import faiss
 import shutil
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
