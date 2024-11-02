@@ -15,11 +15,11 @@ sudo apt-get upgrade -y
 
 # Install prerequisite packages
 echo_msg "Installing prerequisite packages"
-sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release net-tools iputils-ping telnet
+sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release net-tools iputils-ping telnet git unzip
 
 
 # -------------------------------
-# Install Docker
+# Install AWS CLI
 # -------------------------------
 echo_msg "Installing AWS CLI"
 
@@ -65,40 +65,33 @@ sudo systemctl start docker
 # -------------------------------
 # Install Kubernetes Tools (kubeadm, kubelet, kubectl)
 # -------------------------------
-echo_msg "Installing Kubernetes tools (kubeadm, kubelet, kubectl)"
+# echo_msg "Installing Kubernetes tools (kubeadm, kubelet, kubectl)"
 
-# Add Kubernetes’ official GPG key
-echo_msg "Adding Kubernetes' GPG key"
-curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/kubernetes-archive-keyring.gpg
+# sudo apt-get update
+# # apt-transport-https may be a dummy package; if so, you can skip that package
+# sudo apt-get install -y apt-transport-https ca-certificates curl gpg
+# curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+# echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
-# Add Kubernetes apt repository
-echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+# # Update package index
+# sudo apt-get update -y
 
-# Update package index
-sudo apt-get update -y
+# # Install kubelet, kubeadm, and kubectl
+# sudo apt-get install -y kubelet kubeadm kubectl
 
-# Install kubelet, kubeadm, and kubectl
-sudo apt-get install -y kubelet kubeadm kubectl
+# # Hold Kubernetes packages at current version to prevent accidental upgrades
+# sudo apt-mark hold kubelet kubeadm kubectl
 
-# Hold Kubernetes packages at current version to prevent accidental upgrades
-sudo apt-mark hold kubelet kubeadm kubectl
+# # -------------------------------
+# # Install Helm
+# # -------------------------------
+# echo_msg "Installing Helm"
 
-# -------------------------------
-# Install Helm
-# -------------------------------
-echo_msg "Installing Helm"
+# # Download and install Helm
+# curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
-# Download and install Helm
-curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-
-# Verify Helm installation
-helm version
-
-# -------------------------------
-# Install Git
-# -------------------------------
-echo_msg "Installing Git"
-sudo apt-get install -y git
+# # Verify Helm installation
+# helm version
 
 # -------------------------------
 # Install Python3
