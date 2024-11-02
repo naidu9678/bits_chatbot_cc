@@ -7,7 +7,7 @@ import pickle
 from pypdf import PdfReader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain import FAISS, OpenAI
+from langchain import FAISS
 
 from app.utils import get_list_of_files
 from app.config import Config
@@ -21,7 +21,13 @@ def read_pdf(pdf_file):
         if content:
             raw_text += content
 
-    text_splitter = CharacterTextSplitter(separator="\n", chunk_size=600000, chunk_overlap=200, length_function=len)
+    text_splitter = CharacterTextSplitter(
+        separator="\n",
+        chunk_size=600000,
+        chunk_overlap=200,
+        length_function=len
+    )
+
     texts = text_splitter.split_text(raw_text)
     return texts
 
@@ -32,7 +38,7 @@ def gen_index_doc(pdf_file):
     document_index = FAISS.from_texts(text, embeddings)
     pickle_path = Config.PICKLE_DOCS_PATH + os.path.basename(pdf_file).replace(".pdf", ".pickle")
     with open(pickle_path, 'wb') as f:
-        pickle.dump(pickle_path, f, pickle.HIGHEST_PROTOCOL)
+        pickle.dump(document_index, f, pickle.HIGHEST_PROTOCOL)
     
     return pickle_path
 
@@ -47,15 +53,6 @@ def main():
         format_strs=['.pickle']
     )
 
-    list_of_pdf_filenames = [
-        os.path.splitext(os.path.basename(path))[0]
-        for path in list_of_pdfs
-    ]
-    list_of_pickles_filenames = [
-        os.path.splitext(os.path.basename(path))[0]
-        for path in list_of_pickles
-    ]
-
     for pdf_file in list_of_pdfs:
         file_name = os.path.splitext(os.path.basename(pdf_file))[0]
         corr_pickle = os.pat.join(
@@ -63,7 +60,7 @@ def main():
             file_name + ".pickle"
         )
 
-        if corr_pickle in list_of_pickles_filenames:
+        if corr_pickle in list_of_pickles:
             list_of_pickles.remove(corr_pickle)
         else:
             print(f"Generating index for {file_name}.pickle")
