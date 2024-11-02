@@ -13,6 +13,9 @@ services:
       - ./S3:/mnt/s3
     environment:
       - LLM_API_KEY=AIzaSyBG5TCCSusvqD7sCnrZfz6TgHoRpJJIxXM
+      - AWS_ACCESS_KEY_ID=replace
+      - AWS_SECRET_ACCESS_KEY=replace
+
     command: >
       sh -c "streamlit run main.py --server.port=8501 --server.address=0.0.0.0"
     ports:
