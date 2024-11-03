@@ -1,4 +1,4 @@
-# BITS WILP Smart Assistant
+# BITS WILP Smart AI Assistant
 
 This project is a smart assistant designed to process PDF documents, extract their content, and store the extracted data in a FAISS (Facebook AI Similarity Search) vector store. The project also includes functionality for interacting with AWS S3 for downloading and uploading files.
 
