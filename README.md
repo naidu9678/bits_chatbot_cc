@@ -87,7 +87,7 @@ The project leverages AWS services to handle the processing and storage of PDF d
 ![AWS Architecture](docs/images/aws_architecture.png?)
 
 1. **S3 Buckets**: Used for storing the PDF files and the FAISS vector store.
-![S3 Bucket](docs/images/S3Bucket.png?)
+![S3 Bucket](docs/images/S3Bucket.png?raw=true)
 ![S3 FAISS Folder](docs/images/S3-FAISS.png?)
 ![S3 PDF Folder](docs/images/S3-PDF.png?)
 
