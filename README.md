@@ -7,12 +7,13 @@ This project is a smart assistant designed to process PDF documents, extract the
 - [Project Structure](#project-structure)
 - [Setup](#setup)
 - [Usage](#usage)
+- [AWS](#aws)
 - [Environment Variables](#environment-variables)
 - [Docker](#docker)
 - [AWS Lambda](#aws-lambda)
 - [Contributing](#contributing)
 - [License](#license)
-
+-
 
 ## Setup
 
@@ -76,6 +77,44 @@ This project is a smart assistant designed to process PDF documents, extract the
     ```sh
     docker-compose up
     ```
+
+## AWS
+
+### AWS Architecture
+
+The project leverages AWS services to handle the processing and storage of PDF documents. Below is an overview of the AWS architecture used in this project:
+
+![AWS Architecture](docs/images/aws_architecture.png)
+
+1. **S3 Buckets**: Used for storing the PDF files and the FAISS vector store.
+![S3 Bucket](docs/images/S3Bucket.png)
+![S3 FAISS Folder](docs/images/S3-FAISS.png)
+![S3 PDF Folder](docs/images/S3-PDF.png)
+
+2. **Secrets Manager**: Stores a key-value pair, protecting secret values.
+![Secret Record](docs/images/SecretsManager.png)
+
+3. **IAM Roles**: Ensures secure access to the S3 buckets and other AWS resources.
+![IAM Role](docs/images/IAMRole.png)
+
+4. **IAM Policy**: Defines the permissions for the IAM roles to interact with AWS services securely.
+![S3 Policy](docs/images/IAMPolicy-S3.png)
+![Secrets Policy](docs/images/IAMPolicy-Secrets.png)
+
+### PDF Loader Flow
+
+The PDF loader script is designed to automate the entire process of downloading, processing, and uploading files. Below is the flow of the function: 
+
+1. **Trigger**: The function is triggered by a cronjob (scheduled event).
+2. **Download**: The function downloads the PDF files from the S3 bucket.
+3. **Process**: The PDFs are processed, and the text is extracted and added to the FAISS vector store.
+4. **Upload**: The updated FAISS vector store is uploaded back to the S3 bucket.
+
+## Environment Variables
+
+The following environment variables need to set:
+
+- `GOOGLE_API_KEY`: API key for the language model.
 
 ## Docker
 
