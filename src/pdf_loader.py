@@ -22,7 +22,6 @@ def load_pdfs_to_vectorstore(pdf_paths, faiss_index_path):
     # Set required environment variables for gemini api key
     set_env_variable()
 
-
     try:
         # Create embeddings
         embedding_model = GoogleGenerativeAIEmbeddings(model="models/embedding-001")

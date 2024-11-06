@@ -2,18 +2,79 @@
 
 This project is a smart assistant designed to process PDF documents, extract their content, and store the extracted data in a FAISS (Facebook AI Similarity Search) vector store. The project also includes functionality for interacting with AWS S3 for downloading and uploading files.
 
-## Table of Contents
+## Problem Statement
 
-- [Project Structure](#project-structure)
-- [Setup](#setup)
-- [Usage](#usage)
-- [AWS](#aws)
-- [Environment Variables](#environment-variables)
-- [Docker](#docker)
-- [AWS Lambda](#aws-lambda)
-- [Contributing](#contributing)
-- [License](#license)
--
+- To enhance the student experience and streamline academic support, we aim to build a Smart AI Chatbot tailored for the BITS Pilani Work Integrated Learning Program (WILP)  
+- This chatbot will provide students with instant, 24/7 support for their academic and administrative queries, personalized learning resources, and seamless access to program information
+- It will leverage AI to offer context-aware responses, track students' learning progress, and provide tailored assistance to help them manage assignments, deadlines, and other academic activities efficiently
+
+## Market survey
+
+- Retrieval Augmented Generation (RAG) technique in AI is widely used solution by many organization to build Smart AI Chatbots for their custom data.
+- A similar tool is provided by AnythinLLM as a local application, however this is not a good fit for a customer facing application.
+
+## USP
+
+- 24/7 Accessibility
+- Comprehensive Academic Resource
+- Real-time Guidance
+- Time-Saving for Faculty and Support Staff
+
+## How it fills the Gap?
+
+- The BITS WILP Smart AI Chatbot can bridge significant gaps in the educational experience by addressing specific needs of students, faculty, and administrative staff.
+- Real-Time Student Support
+- Streamlined Administrative/Academic Queries
+
+## Components Overview
+
+We have make an active effort to maintain modularity such that the code is easy to scale and adaptable to similar use cases and maintain upgradability.
+
+### PDF Loader
+
+- This component is responsible for parsing and vectorising as well as storing the vector indexes in a static easily accessible manner, using FAISS (Facebook AI Similarity Search) vector store.
+- The PDFs are stored in a S3 bucket and accessed using boto3.
+- The vectorizer is trained using `GoogleGenerativeAIEmbeddings`'s model `models/embedding-001`.
+
+    ```python
+    # simplified code block
+    # Create embeddings
+    embedding_model = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+    vectorstore = FAISS.load_local(faiss_index_path, embedding_model, allow_dangerous_deserialization=True)
+
+    for pdf_path in pdf_paths:
+        # Load PDF
+        loader = PyPDFLoader(pdf_path)
+        data = loader.load()
+
+        # Split text
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000)
+        docs = text_splitter.split_documents(data)
+
+        # Add new documents to the vector store
+        vectorstore.add_documents(docs)
+
+    # Save the updated vector store
+    vectorstore.save_local(faiss_index_path)
+
+    ```
+
+### Chatbot
+
+- This component is responsible for providing a chatbot interface to users.
+- On every msg query the Vector Store is queried for relevant documents using FAISS and then a response is generated using `GoogleGenerativeAIEmbeddings` model `models/response-001`.
+
+    ```python
+    embedding_model = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+        vectorstore = FAISS.load_local(
+            "static/faiss_index",
+            embedding_model,
+            allow_dangerous_deserialization=True
+        )
+    ```
+
+- LLM model used is `ChatGoogleGenerativeAI`'s `gemini-1.5-pro`
+- 
 
 ## Setup
 
