@@ -32,6 +32,8 @@ We have make an active effort to maintain modularity such that the code is easy 
 
 ### PDF Loader
 
+![PDF Loader](docs/images/pdf_loader_flow.png?)
+
 - This component is responsible for parsing and vectorising as well as storing the vector indexes in a static easily accessible manner, using FAISS (Facebook AI Similarity Search) vector store.
 - The PDFs are stored in a S3 bucket and accessed using boto3.
 - The vectorizer is trained using `GoogleGenerativeAIEmbeddings`'s model `models/embedding-001`.
