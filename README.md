@@ -88,18 +88,18 @@ The project leverages AWS services to handle the processing and storage of PDF d
 
 1. **S3 Buckets**: Used for storing the PDF files and the FAISS vector store.
 ![S3 Bucket](docs/images/S3Bucket.png?raw=true)
-![S3 FAISS Folder](docs/images/S3-FAISS.png?)
-![S3 PDF Folder](docs/images/S3-PDF.png?)
+![S3 FAISS Folder](docs/images/S3-FAISS.png?raw=true)
+![S3 PDF Folder](docs/images/S3-PDF.png?raw=true)
 
 2. **Secrets Manager**: Stores a key-value pair, protecting secret values.
-![Secret Record](docs/images/SecretsManager.png)
+![Secret Record](docs/images/SecretsManager.png?raw=true)
 
 3. **IAM Roles**: Ensures secure access to the S3 buckets and other AWS resources.
-![IAM Role](docs/images/IAMRole.png)
+![IAM Role](docs/images/IAMRole.png?raw=true)
 
 4. **IAM Policy**: Defines the permissions for the IAM roles to interact with AWS services securely.
-![S3 Policy](docs/images/IAMPolicy-S3.png)
-![Secrets Policy](docs/images/IAMPolicy-Secrets.png)
+![S3 Policy](docs/images/IAMPolicy-S3.png?raw=true)
+![Secrets Policy](docs/images/IAMPolicy-Secrets.png?raw=true)
 
 ### PDF Loader Flow
 
