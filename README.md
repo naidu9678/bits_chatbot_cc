@@ -32,6 +32,13 @@ We have make an active effort to maintain modularity such that the code is easy 
 
 ### PDF Loader
 
+The PDF loader script is designed to automate the entire process of downloading, processing, and uploading files. Below is the flow of the function: 
+
+1. **Trigger**: The function is triggered by a cronjob (scheduled event).
+2. **Download**: The function downloads the PDF files from the S3 bucket.
+3. **Process**: The PDFs are processed, and the text is extracted and added to the FAISS vector store.
+4. **Upload**: The updated FAISS vector store is uploaded back to the S3 bucket.
+
 ```mermaid
 flowchart TD
     S3[(Amazon S3)]
@@ -43,7 +50,6 @@ flowchart TD
     PDFLoader -->|Push the pickle/index files back to S3| S3
 ```
 
-- This component is responsible for parsing and vectorising as well as storing the vector indexes in a static easily accessible manner, using FAISS (Facebook AI Similarity Search) vector store.
 - The PDFs are stored in a S3 bucket and accessed using boto3.
 - The vectorizer is trained using `GoogleGenerativeAIEmbeddings`'s model `models/embedding-001`.
 
@@ -72,6 +78,18 @@ flowchart TD
 
 ### Chatbot
 
+```mermaid
+flowchart TD
+    Actor --> UI[Chatbot UI]
+    UI --> Chunk[Convert Query into Chunks]
+    Chunk --> Match[Use Chunks to Match with Indexes]
+    Index[Indexes Files Stored in Directory] --> Match
+    Match --> LLMInput[Pass the Matched Streams to LLM]
+    LLMInput --> LLM[LLM Transforms the Result]
+    LLM --> UIResult[Result String Back to UI]
+    UIResult --> UI
+```
+
 - This component is responsible for providing a chatbot interface to users.
 - On every msg query, the Vector Store is queried for relevant documents using FAISS and then a response is generated using `GoogleGenerativeAIEmbeddings` model `models/response-001`.
 
@@ -91,10 +109,52 @@ flowchart TD
     vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 10})
     ```
 
-## S3 Bucket
+### S3 Bucket
 
 - This component is responsible for storing and retrieving pdfs and `FAISS Indexes`.
-- Although the chatbot directly interacts with the vectorstore stored locally, `S3 Bucket` is used to store maintains common context accross all chatbot instances as well as allows us 
+- Although the chatbot directly interacts with the vectorstore stored locally, `S3 Bucket` is used to maintain common context accross all chatbot instances and also allows us to hot load new pdf to the vectorstore.
+- All interaction with the S3 bucket is done through `pdf_loader.py`
+
+### Secrets Manager
+
+- This component is responsible for storing and retrieving secrets used by the application.
+- The secrets are stored in `AWS Secrets Manager` and accessed using `boto3`.
+
+    ```python
+    def set_env_variable():
+        client = boto3.client(
+            'secretsmanager',
+            region_name=Config.REGION_NAME
+        )
+        api_key = client.get_secret_value(
+            SecretId=Config.SECRET_RECORD
+        )['SecretString']
+
+        os.environ['GOOGLE_API_KEY'] = json.loads(api_key).get('GOOGLE_API_KEY')
+    ```
+
+## AWS
+
+### AWS Architecture
+
+The project leverages AWS services to handle the processing and storage of PDF documents. Below is an overview of the AWS architecture used in this project:
+
+![AWS Architecture](docs/images/aws_architecture.png?)
+
+1. **S3 Buckets**: Used for storing the PDF files and the FAISS vector store.
+![S3 Bucket](docs/images/S3Bucket.png?raw=true)
+![S3 FAISS Folder](docs/images/S3-FAISS.png?raw=true)
+![S3 PDF Folder](docs/images/S3-PDF.png?raw=true)
+
+2. **Secrets Manager**: Stores a key-value pair, protecting secret values.
+![Secret Record](docs/images/SecretsManager.png?raw=true)
+
+3. **IAM Roles**: Ensures secure access to the S3 buckets and other AWS resources.
+![IAM Role](docs/images/IAMRole.png?raw=true)
+
+4. **IAM Policy**: Defines the permissions for the IAM roles to interact with AWS services securely.
+![S3 Policy](docs/images/IAMPolicy-S3.png?raw=true)
+![Secrets Policy](docs/images/IAMPolicy-Secrets.png?raw=true)
 
 ## Setup
 
@@ -159,37 +219,6 @@ flowchart TD
     docker-compose up
     ```
 
-## AWS
-
-### AWS Architecture
-
-The project leverages AWS services to handle the processing and storage of PDF documents. Below is an overview of the AWS architecture used in this project:
-
-![AWS Architecture](docs/images/aws_architecture.png?)
-
-1. **S3 Buckets**: Used for storing the PDF files and the FAISS vector store.
-![S3 Bucket](docs/images/S3Bucket.png?raw=true)
-![S3 FAISS Folder](docs/images/S3-FAISS.png?raw=true)
-![S3 PDF Folder](docs/images/S3-PDF.png?raw=true)
-
-2. **Secrets Manager**: Stores a key-value pair, protecting secret values.
-![Secret Record](docs/images/SecretsManager.png?raw=true)
-
-3. **IAM Roles**: Ensures secure access to the S3 buckets and other AWS resources.
-![IAM Role](docs/images/IAMRole.png?raw=true)
-
-4. **IAM Policy**: Defines the permissions for the IAM roles to interact with AWS services securely.
-![S3 Policy](docs/images/IAMPolicy-S3.png?raw=true)
-![Secrets Policy](docs/images/IAMPolicy-Secrets.png?raw=true)
-
-### PDF Loader Flow
-
-The PDF loader script is designed to automate the entire process of downloading, processing, and uploading files. Below is the flow of the function: 
-
-1. **Trigger**: The function is triggered by a cronjob (scheduled event).
-2. **Download**: The function downloads the PDF files from the S3 bucket.
-3. **Process**: The PDFs are processed, and the text is extracted and added to the FAISS vector store.
-4. **Upload**: The updated FAISS vector store is uploaded back to the S3 bucket.
 
 ## Environment Variables
 
@@ -208,10 +237,6 @@ The `Dockerfile` sets up the environment with necessary dependencies and install
 ### docker-compose.yml
 
 The `docker-compose.yml` file defines the services and their configurations.
-
-## AWS Lambda
-
-The project includes an AWS Lambda function in `improvements/LambdaFunction.py` to automate the process of downloading files from S3, processing PDFs, and uploading the updated vector store back to S3.
 
 ## Contributing
 
