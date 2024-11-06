@@ -7,7 +7,6 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
-from dotenv import load_dotenv
 from aws_utils import set_env_variable
 
 # Load environment variables from .env file
@@ -21,6 +20,7 @@ st.title("BITS WILP Smart AI Assistant")
 if 'vectorstore' not in st.session_state:
     st.session_state.vectorstore = None
     st.session_state.chat_history = []
+
 
 def initialize_vectorstore():
     """Initialize the vector store and load it into session state if not already done."""

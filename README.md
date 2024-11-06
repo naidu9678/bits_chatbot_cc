@@ -32,7 +32,16 @@ We have make an active effort to maintain modularity such that the code is easy 
 
 ### PDF Loader
 
-![PDF Loader](docs/images/pdf_loader_flow.png?)
+```mermaid
+flowchart TD
+    S3[(Amazon S3)]
+    LOCAL[Local Folder]
+    PDFLoader[pdf_loader.py]
+    
+    S3 -->|Pull PDFs and index files in a separate directory| LOCAL
+    LOCAL -->|from PDF directory, start converting and create FAISS index file\nUse Gemini API KEY for embedding model| PDFLoader
+    PDFLoader -->|Push the pickle/index files back to S3| S3
+```
 
 - This component is responsible for parsing and vectorising as well as storing the vector indexes in a static easily accessible manner, using FAISS (Facebook AI Similarity Search) vector store.
 - The PDFs are stored in a S3 bucket and accessed using boto3.
@@ -64,7 +73,7 @@ We have make an active effort to maintain modularity such that the code is easy 
 ### Chatbot
 
 - This component is responsible for providing a chatbot interface to users.
-- On every msg query the Vector Store is queried for relevant documents using FAISS and then a response is generated using `GoogleGenerativeAIEmbeddings` model `models/response-001`.
+- On every msg query, the Vector Store is queried for relevant documents using FAISS and then a response is generated using `GoogleGenerativeAIEmbeddings` model `models/response-001`.
 
     ```python
     embedding_model = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
@@ -76,7 +85,16 @@ We have make an active effort to maintain modularity such that the code is easy 
     ```
 
 - LLM model used is `ChatGoogleGenerativeAI`'s `gemini-1.5-pro`
-- 
+- Similarity search is then performed on the vectors loaded and the best match is sent to the LLM model for response generation.
+
+    ```python
+    vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 10})
+    ```
+
+## S3 Bucket
+
+- This component is responsible for storing and retrieving pdfs and `FAISS Indexes`.
+- Although the chatbot directly interacts with the vectorstore stored locally, `S3 Bucket` is used to store maintains common context accross all chatbot instances as well as allows us 
 
 ## Setup
 
