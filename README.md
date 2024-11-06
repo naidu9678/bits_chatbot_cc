@@ -84,12 +84,12 @@ This project is a smart assistant designed to process PDF documents, extract the
 
 The project leverages AWS services to handle the processing and storage of PDF documents. Below is an overview of the AWS architecture used in this project:
 
-![AWS Architecture](docs/images/aws_architecture.png)
+![AWS Architecture](docs/images/aws_architecture.png?)
 
 1. **S3 Buckets**: Used for storing the PDF files and the FAISS vector store.
-![S3 Bucket](docs/images/S3Bucket.png)
-![S3 FAISS Folder](docs/images/S3-FAISS.png)
-![S3 PDF Folder](docs/images/S3-PDF.png)
+![S3 Bucket](docs/images/S3Bucket.png?)
+![S3 FAISS Folder](docs/images/S3-FAISS.png?)
+![S3 PDF Folder](docs/images/S3-PDF.png?)
 
 2. **Secrets Manager**: Stores a key-value pair, protecting secret values.
 ![Secret Record](docs/images/SecretsManager.png)
