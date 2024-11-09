@@ -7,7 +7,6 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
-from dotenv import load_dotenv
 from aws_utils import set_env_variable
 
 # Load environment variables from .env file
@@ -22,15 +21,21 @@ if 'vectorstore' not in st.session_state:
     st.session_state.vectorstore = None
     st.session_state.chat_history = []
 
+
 def initialize_vectorstore():
     """Initialize the vector store and load it into session state if not already done."""
     try:
         embedding_model = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-        vectorstore = FAISS.load_local("static/faiss_index", embedding_model, allow_dangerous_deserialization=True)
+        vectorstore = FAISS.load_local(
+            "static/faiss_index",
+            embedding_model,
+            allow_dangerous_deserialization=True
+        )
         st.session_state.vectorstore = vectorstore
     except Exception as e:
         st.error(f"Error initializing vector store: {e}")
         raise
+
 
 def setup_retriever():
     """Set up the retriever for the vector store."""
@@ -40,6 +45,7 @@ def setup_retriever():
         st.error(f"Error setting up retriever: {e}")
         raise
 
+
 def setup_llm():
     """Initialize the Language Model (LLM) for generating responses."""
     try:
@@ -47,6 +53,7 @@ def setup_llm():
     except Exception as e:
         st.error(f"Error initializing LLM: {e}")
         raise
+
 
 def setup_prompt_template():
     """Set up the system and human prompt template for the chat."""
@@ -67,6 +74,7 @@ def setup_prompt_template():
     except Exception as e:
         st.error(f"Error setting up prompt template: {e}")
         raise
+
 
 def process_query(query, retriever, llm, prompt):
     """Process the user query through the retrieval and generation pipeline."""
