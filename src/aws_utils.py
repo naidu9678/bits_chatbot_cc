@@ -63,8 +63,9 @@ def get_all_pickles():
             Prefix=Config.PICKLE_DIR
         )
         if 'Contents' in response:
-            pickle_files = [obj['Key'] for obj in response['Contents']]
+            pickle_files = [obj['Key'] for obj in response['Contents'] if not obj['Key'].endswith('/')]
             print("Pickle Files:", pickle_files)
+            return(pickle_files)
         else:
             print("No Pickle files found.")
     except (ClientError, NoCredentialsError) as e:
@@ -115,6 +116,7 @@ def download_pickles_to_local(local_folder):
                 file_key,
                 local_path
             )
+            print("Downloaded")
     except (ClientError, NoCredentialsError) as e:
         print(f'Error downloading files: {e}')
 
@@ -126,8 +128,13 @@ def upload_directory_to_s3(local_folder):
     for root, _, files in os.walk(local_folder):
         for file in files:
             local_path = os.path.join(root, file)
-            s3_path = os.path.join(Config.PICKLE_DIR, file)
-            s3.upload_file(local_path, Config.BUCKET_NAME, Config.PICKLE_DIR)
+            # Correctly form the s3_path relative to the PICKLE_DIR
+            relative_path = os.path.relpath(local_path, start=local_folder)
+            s3_path = os.path.join(Config.PICKLE_DIR, relative_path)
+            print(f"Uploading {local_path} to {s3_path}...")
+            # Fix: changed the third parameter to `s3_path` instead of `Config.PICKLE_DIR`
+            s3.upload_file(local_path, Config.BUCKET_NAME, s3_path)
+    print("Upload complete.")
 
 
 def add_pdf(file_name, file_path):
